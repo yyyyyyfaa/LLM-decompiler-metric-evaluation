@@ -1,41 +1,35 @@
 # Evaluating Metrics for LLM-based Decompilers
 
-My bachelor's thesis at LMU Munich examined how well automatic metrics reflect errors in code recovered by an LLM-based decompiler. I evaluated SK²Decompile, compared its outputs with source code and IDA pseudocode, and analysed the relationship between automatic scores and manual findings.
+My bachelor's thesis at LMU Munich examined how well automatic metrics reflect errors in code recovered by an LLM-based decompiler. I evaluated SK²Decompile across four datasets, compared its outputs with source code and IDA pseudocode, and used AUC and Spearman correlation to analyse metric effectiveness and agreement.
 
-## Main findings
+## Findings and contribution
 
-Of 400 HumanEval and MBPP outputs, **341 compiled and 258 passed all supplied tests**. The remaining 83 compilable outputs failed at least one test.
+High automatic scores sometimes accompanied confirmed semantic errors. Compilation and code similarity captured different aspects of output quality, while readability scores depended on the reference used. Re-execution gave the clearest separation between the manually reviewed groups in the controlled benchmarks.
+
+I connected the automatic scores to manually classified code differences to identify what each metric revealed and where the metrics provided overlapping or complementary information. This analysis supports evaluation recommendations that combine behavioural checks with complementary metrics. A separate floating-point analysis examined numerical errors that the category labels did not describe in enough detail.
 
 ![Compilation and test results](figures/compilation_vs_execution.png)
 
-Re-execution separated the manually reviewed groups more clearly than compilation: AUC was 0.920 versus 0.634 on 48 labelled cases. Source-similarity metrics performed differently across datasets. Readability also depended on the reference: 208 of 362 cases changed the direction of their score difference when the reference changed from IDA to source code.
+## Evaluation
 
-These findings led me to examine which code properties each metric measures, how closely the metrics agree, and which errors remain in highly scored outputs. The manual analysis also covered floating-point calculations and boundary conditions.
+| Dataset | Role |
+|---|---|
+| HumanEval and MBPP | Compilation, test execution and source-code comparison |
+| GitHub2025 | Function-name recovery |
+| DecBench | Source and binary comparison for real-project functions |
 
-## Study
-
-| Dataset | Evaluation cases | Available outputs | Evaluation |
-|---|---:|---:|---|
-| HumanEval and MBPP | 400 | 400 | Compilation, test execution and source comparison |
-| GitHub2025 | 200 | 200 | Function-name recovery |
-| DecBench | 250 | 231 | Real-project source and binary comparison |
-
-The study covered 850 cases and 831 available outputs. HumanEval/MBPP and GitHub2025 included matched functions compiled at O0–O3. The manual samples contained 50 HumanEval/MBPP functions and 100 DecBench cases, classified using the C0–C14 decompilation taxonomy.
-
-I used AUC to compare scores against manual semantic labels and Spearman correlation to compare metric rankings. Valid sample counts were retained for each analysis. Compilation failures, missing inputs and extraction failures were recorded separately.
+The manual analysis used the C0–C14 decompilation taxonomy. AUC measured how well scores separated outputs with confirmed semantic differences from those with no confirmed difference. Spearman correlation compared metric rankings. Results were analysed by dataset and optimisation condition, with valid sample counts retained for each comparison.
 
 ## Run the analysis
 
-The repository includes 400 HumanEval/MBPP metric records from the thesis experiments. The Python script produces score summaries, results by optimisation level and pairwise Spearman correlations.
+The repository includes 400 HumanEval/MBPP metric records from the thesis experiments. The script produces score summaries, results by optimisation level and pairwise Spearman correlations.
 
 ```sh
 python -m pip install -r requirements.txt
 python scripts/analyze.py
 ```
 
-The compilation and test counts above are reproduced from these records. AUC and reference-comparison findings are reported from the thesis.
-
-- [Results](results/REPORT.md)
+- [Results and detailed statistics](results/REPORT.md)
 - [Metric records and field definitions](data/README.md)
 - [Analysis code](scripts/analyze.py)
 
