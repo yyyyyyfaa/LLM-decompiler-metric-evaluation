@@ -1,0 +1,16 @@
+{
+  "packaged_on": "2026-10-13",
+  "kind": "numeric projection of existing author experiment records",
+  "source_files": [
+    {
+      "name": "complete_metrics400_adapted_r2i.jsonl",
+      "sha256": "cf84c142cc68312d75c1b4f738a0057d716520107f849045bd013e5411d7de33"
+    },
+    {
+      "name": "r2i_source400.jsonl",
+      "sha256": "fe19b6c6910aa8061fe0ac829383c2f681fba35c12c790869ae9a63dba9f11b8"
+    }
+  ],
+  "rows": 400,
+  "paper": "Author thesis PDF, 2026-09-28 version, chapters 4-5"
+}

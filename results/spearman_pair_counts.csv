@@ -1,0 +1,11 @@
+metric,compile_pass,reexec_pass,edit_similarity,codebleu,codebleu_ngram,codebleu_weighted_ngram,codebleu_syntax,codebleu_dataflow,embedding_similarity,sk2_r2i_valid
+compile_pass,400,400,400,400,400,400,400,400,400,362
+reexec_pass,400,400,400,400,400,400,400,400,400,362
+edit_similarity,400,400,400,400,400,400,400,400,400,362
+codebleu,400,400,400,400,400,400,400,400,400,362
+codebleu_ngram,400,400,400,400,400,400,400,400,400,362
+codebleu_weighted_ngram,400,400,400,400,400,400,400,400,400,362
+codebleu_syntax,400,400,400,400,400,400,400,400,400,362
+codebleu_dataflow,400,400,400,400,400,400,400,400,400,362
+embedding_similarity,400,400,400,400,400,400,400,400,400,362
+sk2_r2i_valid,362,362,362,362,362,362,362,362,362,362

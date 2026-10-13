@@ -1,0 +1,7 @@
+,compile_pass,compile_pass,reexec_pass,reexec_pass
+,count,mean,count,mean
+opt,,,,
+O0,100,0.87,100,0.78
+O1,100,0.87,100,0.68
+O2,100,0.83,100,0.58
+O3,100,0.84,100,0.54
