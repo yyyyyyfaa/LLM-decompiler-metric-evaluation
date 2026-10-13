@@ -1,4 +1,4 @@
-# Recomputed results
+# Metric Analysis
 
 - Original metric records: 400.
 - Compilation: 341/400 (85.25%).
@@ -20,4 +20,4 @@
 
 The CSV correlations include a separate matrix of pairwise sample sizes. A score of zero is retained; a missing value is excluded only from the affected comparison.
 
-These are re-aggregations of frozen thesis metrics, not a fresh model run. AUC figures in the project README are reported from the thesis and are not recomputed here because finalized case-level labels are not bundled.
+The analysis uses the saved thesis metric records. Manual-label AUC results are reported separately in the project README.

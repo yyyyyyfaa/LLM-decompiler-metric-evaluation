@@ -1,4 +1,4 @@
-"""Re-analyse exported original metric records; no inference/scoring is rerun."""
+"""Summarise thesis metric records and compare metric rankings."""
 from pathlib import Path
 import json
 import pandas as pd
@@ -27,7 +27,7 @@ for a in metrics:
 corr.to_csv(out/'spearman.csv',index_label='metric')
 counts.astype(int).to_csv(out/'spearman_pair_counts.csv',index_label='metric')
 compiled = int(df.compile_pass.sum()); passed = int(df.reexec_pass.sum())
-lines = ['# Recomputed results','',
+lines = ['# Metric Analysis','',
  f'- Original metric records: {len(df)}.',
  f'- Compilation: {compiled}/{len(df)} ({compiled/len(df):.2%}).',
  f'- Re-execution: {passed}/{len(df)} ({passed/len(df):.2%}).',
@@ -36,7 +36,7 @@ lines = ['# Recomputed results','',
 for name,row in summary.iterrows():
     lines.append(f'| {name} | {int(row["count"])} | {row["mean"]:.3f} | {row["median"]:.3f} |')
 lines += ['', 'The CSV correlations include a separate matrix of pairwise sample sizes. A score of zero is retained; a missing value is excluded only from the affected comparison.',
- '', 'These are re-aggregations of frozen thesis metrics, not a fresh model run. AUC figures in the project README are reported from the thesis and are not recomputed here because finalized case-level labels are not bundled.']
+ '', 'The analysis uses the saved thesis metric records. Manual-label AUC results are reported separately in the project README.']
 (out/'REPORT.md').write_text('\n'.join(lines)+'\n',encoding='utf-8')
 (out/'environment.json').write_text(json.dumps({'pandas':pd.__version__},indent=2)+'\n')
 print('\n'.join(lines[2:6]))

@@ -1,55 +1,49 @@
-# LLM 反编译结果的评估指标分析
+# Evaluating Metrics for LLM-based Decompilers
 
-**Evaluating and Enhancing Metrics for LLM-based Decompilers**  
-杨艺帆 / Yifan Yang · LMU Munich · 本科毕业论文，2026 年完成
+My bachelor's thesis at LMU Munich examined how well automatic metrics reflect errors in code recovered by an LLM-based decompiler. I evaluated SK²Decompile, compared its outputs with source code and IDA pseudocode, and analysed the relationship between automatic scores and manual findings.
 
-研究问题：自动分数能否识别 LLM 生成代码中的真实错误？不同指标是否提供重复信息？数据集和编译优化条件如何影响评估结果？
+## Main findings
 
-## 我的工作
+Of 400 HumanEval and MBPP outputs, **341 compiled and 258 passed all supplied tests**. The remaining 83 compilable outputs failed at least one test.
 
-- 以两阶段 SK²Decompile 为研究对象，整理输入、输出、源代码参考和优化条件，按案例 ID 对齐评估记录。
-- 覆盖 HumanEval、MBPP、GitHub2025 和 DecBench 共 850 个计划案例，其中 831 个有模型输出。
-- 分析编译、测试重执行、CodeBLEU、CodeSage、可读性、函数命名和二进制相似度，保留有效样本数及失败状态。
-- 对 HumanEval/MBPP 的 50 个函数和 DecBench 的 100 个案例进行人工分析，结合 AUC 和 Spearman 相关分析指标有效性与一致性。
-- 分析浮点精度、舍入和特殊值相关问题，说明自动测试与相似度指标的边界。
+![Compilation and test results](figures/compilation_vs_execution.png)
 
-## 这个仓库可以复现什么
+Re-execution separated the manually reviewed groups more clearly than compilation: AUC was 0.920 versus 0.634 on 48 labelled cases. Source-similarity metrics performed differently across datasets. Readability also depended on the reference: 208 of 362 cases changed the direction of their score difference when the reference changed from IDA to source code.
 
-此仓库是论文的**轻量分析与展示版本**，包含从原始实验记录导出的 400 条 HumanEval/MBPP 数值指标，以及重新整理的统计汇总代码。无需 GPU。完整模型推理、编译环境、第三方代码、DecBench 二进制和人工逐例标注未打包。
+These findings led me to examine which code properties each metric measures, how closely the metrics agree, and which errors remain in highly scored outputs. The manual analysis also covered floating-point calculations and boundary conditions.
+
+## Study
+
+| Dataset | Evaluation cases | Available outputs | Evaluation |
+|---|---:|---:|---|
+| HumanEval and MBPP | 400 | 400 | Compilation, test execution and source comparison |
+| GitHub2025 | 200 | 200 | Function-name recovery |
+| DecBench | 250 | 231 | Real-project source and binary comparison |
+
+The study covered 850 cases and 831 available outputs. HumanEval/MBPP and GitHub2025 included matched functions compiled at O0–O3. The manual samples contained 50 HumanEval/MBPP functions and 100 DecBench cases, classified using the C0–C14 decompilation taxonomy.
+
+I used AUC to compare scores against manual semantic labels and Spearman correlation to compare metric rankings. Valid sample counts were retained for each analysis. Compilation failures, missing inputs and extraction failures were recorded separately.
+
+## Run the analysis
+
+The repository includes 400 HumanEval/MBPP metric records from the thesis experiments. The Python script produces score summaries, results by optimisation level and pairwise Spearman correlations.
 
 ```sh
 python -m pip install -r requirements.txt
 python scripts/analyze.py
 ```
 
-查看 [重新计算的结果](results/REPORT.md)。脚本输出分布统计、O0–O3 分组统计、Spearman 相关矩阵及每对指标的有效样本数。代码检查案例唯一性、400 条记录和“重执行成功必须先编译成功”的一致性。
+The compilation and test counts above are reproduced from these records. AUC and reference-comparison findings are reported from the thesis.
 
-## 关键发现
+- [Results](results/REPORT.md)
+- [Metric records and field definitions](data/README.md)
+- [Analysis code](scripts/analyze.py)
 
-![编译与重执行](figures/compilation_vs_execution.png)
+To redraw the figure, install R and ggplot2, then run `Rscript --vanilla scripts/plot.R`.
 
-该图由本仓库指标生成；如需重绘，可在安装 R 与 ggplot2 后运行 `Rscript --vanilla scripts/plot.R`。统计表复算本身只需要 Python。
+## References
 
-| 观察 | 结果 | 范围与解释 |
-|---|---|---|
-| 编译与测试通过不同 | 341/400 可编译，258/400 通过测试；83 个可编译输出未通过测试 | 本仓库可由逐例指标复算 |
-| 重执行更能区分人工确认错误 | AUC 0.920；编译 AUC 0.634 | 论文报告；仅限人工样本中有效的 48 个案例，不是 400 个全部样本；本仓库未重算 |
-| DecBench 中高分不保证无语义问题 | 原生 byte_match AUC 0.584 | 论文报告，82 个有效人工标签案例；不能与受控样本直接等同 |
-| 可读性结果依赖参考对象 | 362 个双参考有效案例中，208 个变化方向相反 | 论文报告；对 IDA 的提升不等于对源代码的提升 |
+- Yifan Yang. *Evaluating and Enhancing Metrics for LLM-based Decompilers*. Bachelor's thesis, LMU Munich, 2026. Supervisor: Johannes Kinder; co-supervisor: Yunru Wang.
+- SK²Decompile, the evaluated two-stage decompiler.
 
-AUC 的正类是“没有确认语义差异”，高分应倾向该类；这不构成数学意义的等价证明。相关不代表指标可互换。不能把已有模型的效果写成本人训练或优化模型带来的提升。
-
-## 数据范围
-
-| 数据集 | 计划案例 | 模型输出 | 主要用途 |
-|---|---:|---:|---|
-| HumanEval + MBPP | 400 | 400 | 编译、测试、源代码指标；100 个源函数的 O0–O3 变体 |
-| GitHub2025 | 200 | 200 | 函数命名；50 个源函数的 O0–O3 变体 |
-| DecBench | 250 | 231 | 真实项目代码；229 个源代码对，228 个原生评分输入 |
-
-DecBench 的 16 个输入缺失、3 个超长案例与编译失败分别记录，不静默删除。人工复核的 100 个 DecBench 案例中，3 个无法对齐；其余 97 个中 67 个确认差异、17 个无确认差异、13 个上下文不足。
-
-## 来源与边界
-
-说明与展示于本仓库的汇总数字依据作者 2026-09-28 论文稿第 4、5 章及原始冻结实验记录。论文提交与毕业日期为 2026-09-30；本仓库整理于 2026-10-13。模型与第三方基准的贡献归原作者，本项目贡献为评估设计、实验分析与问题解释。
-数据导出字段与来源校验见 [data/README.md](data/README.md) 与 provenance.json。
+The numerical export and its source-file hashes are recorded in `provenance.json`.
